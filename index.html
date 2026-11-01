@@ -266,7 +266,7 @@ const entries = [
     tags: ["Python", "Keras 3", "NumPy"]
   },
   {
-    tab: "projects", date: "2025-12",
+    tab: "projects", date: "2024-12",
     title: "Foam glider optimization",
     line: "Reverse-engineered a foam glider and redesigned its wing for longer flights",
     spec: "~15% longer average flight time",
@@ -411,6 +411,10 @@ function row(e, i) {
   </li>`;
 }
 
+// Newest first, with work in progress on top. Order comes from the dates, not from where an entry sits in the list
+const dateKey = e => (e.date === "now" ? "9999-99" : e.date);
+const newestFirst = (a, b) => dateKey(b).localeCompare(dateKey(a));
+
 function moveIndicator(tab) {
   indicator.style.width = tab.offsetWidth + "px";
   indicator.style.transform = `translateX(${tab.offsetLeft}px)`;
@@ -421,7 +425,7 @@ function show(name, animate) {
   tabs.forEach(t => t.setAttribute("aria-selected", String(t === tab)));
   log.setAttribute("aria-labelledby", tab.id);
   moveIndicator(tab);
-  log.innerHTML = entries.filter(e => e.tab === tab.dataset.tab).map(row).join("");
+  log.innerHTML = entries.filter(e => e.tab === tab.dataset.tab).sort(newestFirst).map(row).join("");
   if (animate) {
     [...log.children].forEach((li, i) => {
       li.classList.add("rise");
