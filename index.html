@@ -129,6 +129,7 @@ button.head:hover { background: var(--raised); }
 
 .repo { justify-self: start; display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 14px; font-weight: 500; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 160ms var(--ease); }
 .repo:hover { border-bottom-color: var(--accent); }
+.links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-width: 560px; }
 .shot { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
 .shot.wide { grid-column: 1 / -1; }
@@ -263,7 +264,10 @@ const entries = [
       "Tested on CPU and GPU. Limits: one dimension only, no hyperparameter tuning, training cost not counted"
     ],
     tags: ["Python", "Keras 3", "NumPy"],
-    link: { href: "https://docs.google.com/spreadsheets/d/1nfBGcoaFHuvEB_6d3zeM3MXTS-7tRS9gwJPW7DOLRsM/edit?gid=0", label: "View the benchmark data" }
+    links: [
+      { href: "files/nn-integration-omni-2026.pdf", label: "View the OMNI slides" },
+      { href: "https://docs.google.com/spreadsheets/d/1nfBGcoaFHuvEB_6d3zeM3MXTS-7tRS9gwJPW7DOLRsM/edit?gid=0", label: "View the benchmark data" }
+    ]
   },
   {
     tab: "projects", date: "2024-12",
@@ -399,6 +403,7 @@ function row(e, i) {
     return `<li class="entry"><div class="head">${date}${text}<span></span></div></li>`;
   }
   const id = `d-${e.tab}-${i}`;
+  const links = e.links || (e.link ? [e.link] : []);
   const tags = (e.tags || []).map(t => `<span class="tag mono">${esc(t)}</span>`).join("");
   return `<li class="entry">
     <button class="head" type="button" aria-expanded="false" aria-controls="${id}">${date}${text}${chevron}</button>
@@ -406,7 +411,7 @@ function row(e, i) {
       ${e.images ? `<div class="shots">${e.images.map(shot).join("")}</div>` : ""}
       <ul>${e.details.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
       ${tags ? `<div class="tags">${tags}</div>` : ""}
-      ${e.link ? `<a class="repo" href="${e.link.href}" target="_blank" rel="noopener">${esc(e.link.label)} <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2h6v6M10 2L3 9"/></svg></a>` : ""}
+      ${links.length ? `<div class="links">${links.map(l => `<a class="repo" href="${l.href}" target="_blank" rel="noopener">${esc(l.label)} <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2h6v6M10 2L3 9"/></svg></a>`).join("")}</div>` : ""}
     </div></div></div>
   </li>`;
 }
