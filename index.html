@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Theodore Veteto</title>
+<meta name="theme-color" content="#f6f7f9">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Theodore Veteto">
+<meta property="og:description" content="Aerospace engineering student at UC Berkeley. A running log of engineering projects and things built with AI.">
+<meta property="og:url" content="https://tedwardo6.github.io/">
+<meta property="og:image" content="https://tedwardo6.github.io/img/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Aerospace engineering student at UC Berkeley. A running log of engineering projects and things built with AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one 720px column read like a flight test log. Dated entries, newest first, one cobalt accent. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --raised: #eef0f4;
+  --fg: #14161a;
+  --fg-2: #4b5260;
+  --fg-3: #6b7280;
+  --accent: #1d4ed8;
+  --line: rgba(20, 22, 26, 0.1);
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1115; --surface: #15181d; --raised: #1d2128;
+    --fg: #eceef2; --fg-2: #a3a9b6; --fg-3: #858b97;
+    --accent: #7ea2ff; --line: rgba(236, 238, 242, 0.1);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1115; --surface: #15181d; --raised: #1d2128;
+  --fg: #eceef2; --fg-2: #a3a9b6; --fg-3: #858b97;
+  --accent: #7ea2ff; --line: rgba(236, 238, 242, 0.1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 720px; margin: 0 auto; padding-block: 64px 96px; display: grid; gap: 48px; }
+.mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+header { display: grid; gap: 16px; }
+.who { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.name { font-size: 16px; font-weight: 500; margin: 0; }
+.meta { color: var(--fg-3); }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.12; font-weight: 500; letter-spacing: -0.02em; margin: 24px 0 0; text-wrap: balance; max-width: 22ch; }
+.lede { color: var(--fg-2); font-size: 17px; line-height: 28px; margin: 0; max-width: 36rem; }
+.contact { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.email { color: var(--fg-2); user-select: all; }
+.btn {
+  font: 500 13px/1 var(--sans); color: var(--fg); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; height: 32px; padding: 0 12px;
+  cursor: pointer; transition: background-color 160ms var(--ease), transform 120ms var(--ease);
+}
+a.btn { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn:hover { background: var(--raised); }
+.btn:active { transform: scale(0.97); }
+
+.tabs { position: relative; display: flex; gap: 24px; border-bottom: 1px solid var(--line); }
+.tab {
+  background: none; border: 0; padding: 12px 0; cursor: pointer;
+  font: 500 15px/1 var(--sans); color: var(--fg-3);
+  display: flex; align-items: baseline; gap: 8px;
+  transition: color 160ms var(--ease);
+}
+.tab[aria-selected="true"] { color: var(--fg); }
+.tab:hover { color: var(--fg); }
+.tab .count { color: var(--fg-3); }
+.indicator {
+  position: absolute; bottom: -1px; left: 0; height: 2px; width: 0;
+  background: var(--accent);
+  transition: transform 350ms var(--ease), width 350ms var(--ease);
+}
+
+.log { list-style: none; margin: 0; padding: 0; }
+.entry { border-bottom: 1px solid var(--line); }
+.head {
+  display: grid; grid-template-columns: 72px minmax(0, 1fr) 20px; gap: 16px; align-items: baseline;
+  width: 100%; padding: 20px 8px; background: none; border: 0; border-radius: 8px;
+  text-align: left; color: inherit; font: inherit;
+  transition: background-color 160ms var(--ease);
+}
+button.head { cursor: pointer; }
+button.head:hover { background: var(--raised); }
+.date { color: var(--fg-3); display: flex; align-items: center; gap: 6px; }
+.date.now { color: var(--accent); }
+.date.now::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.title { display: block; font-size: 16px; font-weight: 500; }
+.line { display: block; color: var(--fg-2); font-size: 14px; margin-top: 4px; }
+.spec { display: block; color: var(--fg-3); margin-top: 8px; }
+.chev { width: 16px; height: 16px; color: var(--fg-3); align-self: center; transition: transform 300ms var(--ease), color 160ms var(--ease); }
+.entry.open .chev { transform: rotate(180deg); color: var(--accent); }
+.entry.open .spec { color: var(--accent); }
+
+.body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 400ms var(--ease); }
+.entry.open .body { grid-template-rows: 1fr; }
+.inner { overflow: hidden; min-height: 0; }
+.detail {
+  padding: 0 8px 24px 96px; display: grid; gap: 16px;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+}
+.entry.open .detail { opacity: 1; transform: none; transition-delay: 80ms; }
+.detail ul { margin: 0; padding-left: 16px; color: var(--fg-2); font-size: 14px; line-height: 22px; display: grid; gap: 4px; max-width: 60ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { color: var(--fg-2); background: var(--raised); border-radius: 4px; padding: 3px 8px; font-size: 11px; }
+
+.repo { justify-self: start; display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 14px; font-weight: 500; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 160ms var(--ease); }
+.repo:hover { border-bottom-color: var(--accent); }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-width: 560px; }
+.shot { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
+.shot.wide { grid-column: 1 / -1; }
+.shot video { display: block; width: 100%; height: auto; background: #ffffff; }
+.shot img { display: block; width: 100%; height: auto; flex: 1; object-fit: contain; background: #f3f3f5; }
+.shot figcaption { padding: 8px 12px; color: var(--fg-3); font-size: 11px; border-top: 1px solid var(--line); }
+
+.plot { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; max-width: 440px; }
+.plot svg { width: 100%; height: auto; display: block; }
+.plot .cap { color: var(--fg-3); font-size: 11px; }
+.trace { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+.entry.open .trace { animation: draw 900ms var(--ease) 150ms both; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--fg-3); }
+
+.rise { animation: rise 500ms var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.head:focus-visible { outline-offset: -2px; }
+
+@media (max-width: 560px) {
+  .page { padding-block: 40px 64px; gap: 40px; }
+  .head { grid-template-columns: minmax(0, 1fr) 20px; row-gap: 6px; }
+  .date { grid-column: 1 / -1; }
+  .detail { padding-left: 8px; }
+  .shots { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<main class="page">
+  <header>
+    <div class="who rise">
+      <p class="name">Theodore Veteto</p>
+      <span class="meta mono">Aerospace engineering · UC Berkeley · Graduating fall 2028</span>
+    </div>
+    <h1 class="rise" style="animation-delay:50ms">I learn by building: gliders, controllers, solvers and games</h1>
+    <p class="lede rise" style="animation-delay:100ms">A running log of my engineering projects and the things I'm building with AI, newest first.</p>
+    <div class="contact rise" style="animation-delay:150ms">
+      <span class="email mono" id="email">theodoreveteto@gmail.com</span>
+      <button class="btn" id="copy" type="button">Copy email</button>
+      <a class="btn" href="https://github.com/Tedwardo6" target="_blank" rel="noopener">GitHub <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2h6v6M10 2L3 9"/></svg></a>
+      <a class="btn" href="https://www.linkedin.com/in/theodore-veteto-072040303/" target="_blank" rel="noopener">LinkedIn <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2h6v6M10 2L3 9"/></svg></a>
+    </div>
+  </header>
+
+  <section class="rise" style="animation-delay:200ms">
+    <div class="tabs" role="tablist" aria-label="Log sections">
+      <button class="tab" role="tab" id="tab-projects" data-tab="projects" aria-selected="true">Projects <span class="count mono"></span></button>
+      <button class="tab" role="tab" id="tab-ai" data-tab="ai" aria-selected="false">Built with AI <span class="count mono"></span></button>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+    <ul class="log" id="log" role="tabpanel"></ul>
+  </section>
+
+  <footer class="mono">
+    <span>Log updated 2026-11</span>
+    <span>Built by hand with Claude</span>
+  </footer>
+</main>
+
+<script>
+// Each entry is one block of data. To add a project, copy a block and edit the fields.
+// date: "YYYY-MM" for finished work, "now" for work in progress.
+// details is optional: entries without it show as a plain row that does not expand.
+const entries = [
+  {
+    tab: "projects", date: "now",
+    title: "Ultralight Crazyflie casing",
+    line: "Designing a protective shell for a Crazyflie 2.1+ nano quadcopter",
+    spec: "Crazyflie 2.1+ · Flow Deck v2 · Crazyradio 2.0 PA",
+    details: [
+      "Goal: protect the frame and propellers in crashes while adding as little mass as possible",
+      "Part of a staged plan toward a drone that follows and orbits a moving person",
+      "Next on the drone: log the onboard state estimator, then fly waypoint trajectories from Python"
+    ],
+    tags: ["CAD", "Python", "cflib"]
+  },
+  {
+    tab: "projects", date: "2026-10",
+    title: "Hand-launched glider contest",
+    line: "Designed a 75 cm glider for a UAVs@Berkeley contest and won against 8 teams",
+    spec: "1st of 9 teams · b = 75 cm · AR 6.25 · AG24 airfoil",
+    images: [
+      { src: "img/contest-glider.jpg", w: 1490, h: 520, wide: true, alt: "CAD render of the contest glider: ribbed wing on two spars, wooden boom and tail", cap: "CAD model" }
+    ],
+    details: [
+      "Used the full 75 cm span limit with a constant 12 cm chord",
+      "Added 5° of dihedral at a center break for passive roll stability",
+      "Picked Mark Drela's AG24 airfoil for low Reynolds number flight, around Re ≈ 68,000",
+      "Sized the tail in CAD: 69 cm² horizontal, 26.25 cm² vertical, 33 cm tail arm"
+    ],
+    tags: ["CAD", "Airfoil selection", "Stability"]
+  },
+  {
+    tab: "projects", date: "2026-08",
+    title: "Balancing beam controls test",
+    line: "A beam held level by two propellers and a PID loop on a Teensy 4.1",
+    spec: "settle <1 s · overshoot <2° · drift <0.1° · 60° range",
+    images: [
+      { src: "img/beam-photo.jpg", w: 810, h: 588, alt: "The balance beam on its wooden stand, propellers spinning at both ends, wired to a Teensy 4.1", cap: "The beam, running" },
+      { video: "img/beam-sim.mp4", poster: "img/beam-sim-poster.jpg", w: 480, h: 420, alt: "Python simulation of the beam recovering from an impulse", cap: "Python simulation, impulse response" },
+      { src: "img/beam-step-response-fast-tune.png", w: 1200, h: 510, wide: true, alt: "Measured angle following step commands from minus 15 to 0 to plus 15 to 0 degrees, with the ramped target dashed", cap: "Logged step response · Kp 2.2, Ki 0.65, Kd 0.28" },
+      { src: "img/beam-disturbance-rejection.png", w: 1200, h: 510, wide: true, alt: "Measured angle recovering from four hand pushes while holding 0 degrees", cap: "Logged push recovery · Kp 2.2, Ki 0.3, Kd 0.4" }
+    ],
+    details: [
+      "Designed in SOLIDWORKS and simulated in MATLAB and Python before building",
+      "Fused a 6-DoF IMU with a complementary filter (α = 0.98)",
+      "Used the raw gyro rate as the derivative term instead of differencing the angle, which removed noise amplification",
+      "Compensated for mismatched motors with separate gains for each direction",
+      "Tuned live over serial and logged 39 test runs, ending with one tune for fast tracking and one for rejecting pushes",
+      "Collaborative summer project"
+    ],
+    tags: ["C++", "Teensy 4.1", "PID", "SOLIDWORKS", "MATLAB"],
+    link: { href: "https://github.com/Tedwardo6/balance-beam", label: "View code and logs on GitHub" }
+  },
+  {
+    tab: "projects", date: "2026-05",
+    title: "Neural network numerical integration",
+    line: "A learned integration method benchmarked against Monte Carlo",
+    spec: "35.5% faster · 121% more accurate · 6 Genz families",
+    details: [
+      "Two-person research project with a faculty advisor, presented at the OMNI conference",
+      "Trained a small 3-layer network in Keras 3 and compared it with a Monte Carlo integrator at 100,000 points",
+      "Error under 0.54% on a first test integral with a known exact solution",
+      "Averages exclude the discontinuous family, where the network was 1623.5% faster and 1428.8% more accurate",
+      "Tested on CPU and GPU. Limits: one dimension only, no hyperparameter tuning, training cost not counted"
+    ],
+    tags: ["Python", "Keras 3", "NumPy"]
+  },
+  {
+    tab: "projects", date: "2025-12",
+    title: "Foam glider optimization",
+    line: "Reverse-engineered a foam glider and redesigned its wing for longer flights",
+    spec: "~15% longer average flight time",
+    images: [
+      { src: "img/glider-cad.jpg", w: 1300, h: 560, wide: true, alt: "SOLIDWORKS model of the foam glider", cap: "SOLIDWORKS model" },
+      { src: "img/glider-vspaero.jpg", w: 1105, h: 451, alt: "Wireframe of the glider geometry used for VSPAERO analysis", cap: "VSPAERO geometry" },
+      { src: "img/glider-lift.jpg", w: 1314, h: 1124, alt: "Spanwise lift distribution plot, cl times c over c ref against span location", cap: "Spanwise lift distribution" }
+    ],
+    details: [
+      "Modeled the original glider in SOLIDWORKS",
+      "Analyzed wing and airfoil designs in VSPAERO and XFOIL to compare their effect on lift and drag",
+      "Built a foam cutter at home to cut and iterate wing designs quickly"
+    ],
+    tags: ["SOLIDWORKS", "VSPAERO", "XFOIL"]
+  },
+  {
+    tab: "projects", date: "2025-12",
+    title: "Fractional calculus in fluids",
+    line: "Compared four fractional operators for modeling memory in boundary-layer flows",
+    spec: "Caputo · Atangana–Baleanu · Caputo–Fabrizio · CPC",
+    images: [
+      { src: "img/fractional-poster.jpg", w: 1600, h: 1290, wide: true, alt: "Poster titled Comparative Analysis of Four Fractional Operators for Boundary-Layer-Type Flows", cap: "Poster presented at OMNI" }
+    ],
+    details: [
+      "Independent research with a faculty advisor at MiraCosta College",
+      "Replacing the time derivative with a fractional one gives the fluid memory: flow near the wall responds to how it moved earlier",
+      "Plotted each operator's kernel in Python. A lower fractional order gives a thicker tail, so past behavior carries more weight",
+      "From the kernels, expected boundary-layer thickness to rank Caputo > Atangana–Baleanu > Caputo–Fabrizio > CPC",
+      "Next step: train a model to pick the operator and order that best fit a data set"
+    ],
+    tags: ["Python", "Fluid mechanics", "Fractional calculus"]
+  },
+  {
+    tab: "projects", date: "2025-12",
+    title: "1D heat equation solver",
+    line: "Derived a finite-difference scheme by hand from Taylor series, then coded it",
+    spec: "explicit FTCS · periodic boundaries · r = αΔt/Δx² = 0.1",
+    images: [
+      { src: "img/heat-decay.png", w: 1024, h: 544, alt: "Plot of u against x at t = 0, 10, 30 and 60, showing the sine wave decaying toward zero", cap: "Solver output: a sine profile diffusing over 60 steps" },
+      { src: "img/heat-notes.jpg", w: 771, h: 1200, alt: "Handwritten notes deriving the update rule from Taylor series and mapping it to the code", cap: "Derivation, from notes to code" }
+    ],
+    details: [
+      "Built the second-derivative approximation from Taylor series expansions, then the explicit time step",
+      "Periodic boundaries with np.roll, so each end of the rod sees the other as its neighbor",
+      "Kept r = 0.1 under the 0.5 limit where the explicit scheme goes unstable",
+      "Added an animation of the profile evolving step by step"
+    ],
+    tags: ["Python", "NumPy", "Matplotlib", "Numerical methods"],
+    link: { href: "https://github.com/Tedwardo6/1D-heat-solver", label: "View code on GitHub" }
+  },
+  {
+    tab: "projects", date: "2025-02",
+    title: "Automated pill sorter",
+    line: "A 24-hour hackathon build that dispenses one pill at a time",
+    spec: "3rd in category · team of 4 · UCSD H.A.R.D. Hack",
+    details: [
+      "Servo control logic with a vibration feed to align single pills",
+      "Rotating 7-day collection plate for weekly organization"
+    ],
+    tags: ["Arduino", "SOLIDWORKS"]
+  },
+  {
+    tab: "ai", date: "now",
+    title: "Roblox games built from an AI handbook",
+    line: "Instead of one-off prompts, AI agents build our games from a shared handbook of context and custom skills",
+    spec: "22-chapter handbook · v1.19 · 18 agent-filed lessons",
+    images: [
+      { src: "img/ghost-hunters.jpg", w: 1198, h: 674, wide: true, alt: "Ghost Hunters thumbnail: a Roblox character running from a large glowing ghost down a dark hallway", cap: "Ghost Hunters thumbnail, rendered by an AI agent in Blender from the game's own assets" }
+    ],
+    details: [
+      "Co-maintain a versioned handbook that every agent reads before working: idea evaluation, engineering, UI kits, effects, analytics and thumbnail production",
+      "Agents log what worked and what broke in an append-only catalog, so each session starts from the last one's lessons",
+      "The same instructions and custom skills carry across Claude, ChatGPT and Codex",
+      "Changes go through branches and pull requests, and a Python tool validates the chapters and builds an export for chat assistants",
+      "Ghost Hunters, a ghost-hunting game, is the first game in progress"
+    ],
+    tags: ["Roblox Studio", "Luau", "Blender", "Context engineering", "Git"]
+  },
+  {
+    tab: "ai", date: "2026-09",
+    title: "CartPole controller from scratch",
+    line: "Learned feedback control by writing every line myself, with Claude as a tutor",
+    spec: "bang-bang → P → PD · Gymnasium CartPole-v1",
+    details: [
+      "Worked around a two-action actuator: the cart can only be pushed left or right",
+      "Found that angular velocity gives the derivative term for free",
+      "Debugged frozen simulations and blind bursts of identical pushes along the way"
+    ],
+    tags: ["Python", "Gymnasium"]
+  }
+];
+
+const chevron = '<svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>';
+
+const log = document.getElementById("log");
+const tabs = [...document.querySelectorAll(".tab")];
+const indicator = document.querySelector(".indicator");
+
+for (const t of tabs) {
+  t.querySelector(".count").textContent = entries.filter(e => e.tab === t.dataset.tab).length;
+}
+
+function esc(s) {
+  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function shot(im) {
+  const media = im.video
+    ? `<video src="${im.video}" poster="${im.poster}" width="${im.w}" height="${im.h}" muted loop playsinline preload="none" aria-label="${esc(im.alt)}"${reduceMotion ? " controls" : ""}></video>`
+    : `<img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy" decoding="async">`;
+  return `<figure class="shot${im.wide ? " wide" : ""}">${media}<figcaption class="mono">${esc(im.cap)}</figcaption></figure>`;
+}
+
+// Videos play only while their entry is open, so closed entries cost nothing
+function setPlaying(entry, on) {
+  entry.querySelectorAll("video").forEach(v => {
+    if (on && !reduceMotion) v.play().catch(() => {});
+    if (!on) v.pause();
+  });
+}
+
+function row(e, i) {
+  const date = e.date === "now"
+    ? '<span class="date now mono">Now</span>'
+    : `<span class="date mono">${e.date}</span>`;
+  const text = `<span><span class="title">${esc(e.title)}</span><span class="line">${esc(e.line)}</span><span class="spec mono">${esc(e.spec)}</span></span>`;
+  if (!e.details) {
+    return `<li class="entry"><div class="head">${date}${text}<span></span></div></li>`;
+  }
+  const id = `d-${e.tab}-${i}`;
+  const tags = (e.tags || []).map(t => `<span class="tag mono">${esc(t)}</span>`).join("");
+  return `<li class="entry">
+    <button class="head" type="button" aria-expanded="false" aria-controls="${id}">${date}${text}${chevron}</button>
+    <div class="body" id="${id}"><div class="inner"><div class="detail">
+      ${e.images ? `<div class="shots">${e.images.map(shot).join("")}</div>` : ""}
+      <ul>${e.details.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+      ${tags ? `<div class="tags">${tags}</div>` : ""}
+      ${e.link ? `<a class="repo" href="${e.link.href}" target="_blank" rel="noopener">${esc(e.link.label)} <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2h6v6M10 2L3 9"/></svg></a>` : ""}
+    </div></div></div>
+  </li>`;
+}
+
+function moveIndicator(tab) {
+  indicator.style.width = tab.offsetWidth + "px";
+  indicator.style.transform = `translateX(${tab.offsetLeft}px)`;
+}
+
+function show(name, animate) {
+  const tab = tabs.find(t => t.dataset.tab === name) || tabs[0];
+  tabs.forEach(t => t.setAttribute("aria-selected", String(t === tab)));
+  log.setAttribute("aria-labelledby", tab.id);
+  moveIndicator(tab);
+  log.innerHTML = entries.filter(e => e.tab === tab.dataset.tab).map(row).join("");
+  if (animate) {
+    [...log.children].forEach((li, i) => {
+      li.classList.add("rise");
+      li.style.animationDelay = Math.min(i, 5) * 50 + "ms";
+    });
+  }
+}
+
+log.addEventListener("click", ev => {
+  const head = ev.target.closest("button.head");
+  if (!head) return;
+  const entry = head.parentElement;
+  const wasOpen = entry.classList.contains("open");
+  log.querySelectorAll(".entry.open").forEach(el => {
+    el.classList.remove("open");
+    el.querySelector("button.head").setAttribute("aria-expanded", "false");
+    setPlaying(el, false);
+  });
+  if (!wasOpen) {
+    entry.classList.add("open");
+    head.setAttribute("aria-expanded", "true");
+    setPlaying(entry, true);
+  }
+});
+
+tabs.forEach(t => t.addEventListener("click", () => {
+  if (t.getAttribute("aria-selected") === "true") return;
+  history.replaceState(null, "", "#" + t.dataset.tab);
+  show(t.dataset.tab, true);
+}));
+
+window.addEventListener("hashchange", () => show(location.hash.slice(1), true));
+window.addEventListener("resize", () => moveIndicator(tabs.find(t => t.getAttribute("aria-selected") === "true")));
+document.fonts && document.fonts.ready.then(() => moveIndicator(tabs.find(t => t.getAttribute("aria-selected") === "true")));
+
+document.getElementById("copy").addEventListener("click", ev => {
+  const btn = ev.currentTarget;
+  const text = document.getElementById("email").textContent;
+  const done = () => { btn.textContent = "Copied"; setTimeout(() => (btn.textContent = "Copy email"), 1600); };
+  const fallback = () => {
+    const r = document.createRange();
+    r.selectNodeContents(document.getElementById("email"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    btn.textContent = "Selected";
+    setTimeout(() => (btn.textContent = "Copy email"), 1600);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, fallback);
+  else fallback();
+});
+
+show(location.hash.slice(1) || "projects", true);
+</script>
+
+</body>
+</html>
